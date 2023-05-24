@@ -12,22 +12,17 @@ function App() {
 
     var data = {
         package_name: "theflyy.com.flyysdk",
-        partner_id: "08c0758cd2ef8dfba42a",
+        partner_id: "89a3e8bed066cc07268e",
         ext_user_token: "nAlyijFANB",
         attachMode: 'popup',
         //attachMode: 'drawer',
         environment: "STAGING"
     };
-    (function () {
-
-        flyySDK.setActionButtonPosition('left');
-        flyySDK.setActionButtonColor('#faa232');
-        flyySDK.setActionButtonText('Reward Points');
-        flyySDK.init(JSON.stringify(data));
-    })();
+    
 
     const code = `const flyySDK = new FlyySDK();
 
+    call this in your token fetch call
     var data = {
         package_name: "<Your-Package-name>",
         partner_id: "<your-partner-id>",
@@ -92,6 +87,27 @@ function App() {
         flyySDK.openSpinTheWheel();
     }
 
+    const [userName, setUserName] = useState("");
+    const startFlyy = () => {
+        fetch(`https://stage-partner-api.theflyy.com/v1/89a3e8bed066cc07268e/user/${userName}/user_token`, {
+            method : "POST",
+            headers : {
+                "partner-key" : "LZDHf0Fm055M3tOIxDfCKGS5LRdExE9H5eQNYf0c",
+                "content-type": "application/json"
+            },
+            body : JSON.stringify({is_new: "false", username: userName})
+        }).then(res => res.json()).then((res) => {
+            console.log(res);
+            data.ext_user_token = res.token;
+            (function () {
+                flyySDK.setActionButtonPosition('left');
+                flyySDK.setActionButtonColor('#faa232');
+                flyySDK.setActionButtonText('Reward Points');
+                flyySDK.init(JSON.stringify(data));
+            })();
+        })
+    }
+
     return (
         <div className="parent-container">
 
@@ -115,6 +131,14 @@ function App() {
                         language={language}
                         showLineNumbers={true}
                         theme={dracula} />
+                </div>
+
+                <div style={{textAlign: 'center'}}>
+                    <h4>Enter user id to generate token in Flyy and Initilize Flyy</h4>
+                    <div  style={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                    <input value={userName} onChange={(e) => {setUserName(e.target.value)}} style={{margin: '5px'}}/>
+                    <button className={"form-control btn-primary mt-2  submit-button"} style={{width: '90px'}} onClick={() => {startFlyy()}}>Init Flyy</button>
+                    </div>
                 </div>
 
                 <h4>Following Methods are availabe for various screens to call.</h4>
