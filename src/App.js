@@ -16,7 +16,7 @@ function App() {
         ext_user_token: "nAlyijFANB",
         attachMode: 'popup',
         //attachMode: 'drawer',
-        environment: "STAGING"
+        environment: "STAGING",
     };
     
 
@@ -38,54 +38,12 @@ function App() {
         flyySDK.setActionButtonPosition('left');
         flyySDK.setActionButtonColor('#faa232');
         flyySDK.setActionButtonText('Reward Points');
+        flyySDK.setUserName("user name set by method");
+        flyySDK.setUserBankCredntials({acc_type: "upi/bank", upi_id: "<upi_id>", "acc_num": "", "ifsc": "", "name":""})
         flyySDK.init(JSON.stringify(data));
-    })();
-`;
+    })();   `;
 
     const language = "js";
-
-    const [todos, setTodos] = useState([
-        {
-            id: 1,
-            text: "Write a new blog post.",
-            isCompleted: false
-        },
-        {
-            id: 2,
-            text: "Pick up laundry.",
-            isCompleted: false
-        },
-        {
-            id: 3,
-            text: "Die.",
-            isCompleted: false
-        }
-    ]);
-
-    const addTodo = (todo) => {
-        setTodos([...todos, { text: todo }]);
-    };
-
-    const markComplete = (index) => {
-        const newTodos = [...todos];
-        newTodos[index].isCompleted = !newTodos[index].isCompleted;
-        setTodos(newTodos);
-    };
-
-    const editTitle = (index, title) => {
-        const newTodos = [...todos];
-        newTodos[index].text = title;
-        setTodos(newTodos);
-    };
-
-    const openOffers = (data) => {
-        console.log(data);
-        flyySDK.clickToOpenSDK(data);
-    }
-
-    const openSpinWheel = () => {
-        flyySDK.openSpinTheWheel();
-    }
 
     const [userName, setUserName] = useState("");
     const startFlyy = () => {
@@ -99,12 +57,12 @@ function App() {
         }).then(res => res.json()).then((res) => {
             console.log(res);
             data.ext_user_token = res.token;
-            (function () {
-                flyySDK.setActionButtonPosition('left');
-                flyySDK.setActionButtonColor('#faa232');
-                flyySDK.setActionButtonText('Reward Points');
-                flyySDK.init(JSON.stringify(data));
-            })();
+            flyySDK.setActionButtonPosition('left');
+            flyySDK.setActionButtonColor('#faa232');
+            flyySDK.setActionButtonText('Reward Points');
+            flyySDK.init(JSON.stringify(data));
+            flyySDK.setUserName("user name set by method");
+            flyySDK.setUserBankCredntials({acc_type: "upi", upi_id: "vinuyer@ybl"})
         })
     }
 
@@ -190,11 +148,11 @@ function App() {
                         <div className={"card-body"}>
                             <h6 className={"card-subtitle mb-2 text-muted"}>To Open Account Screen</h6>
                             <CodeBlock
-                                text={"flyySDK.openAccountScreen()"}
+                                text={"flyySDK.openRedeemScreen()"}
                                 language={language}
                                 theme={dracula} />
                                 <p className={"card-text"}>This Method is to Open the Account Screen.</p>
-                            <button onClick={() => flyySDK.openAccountScreen()} className={"form-control btn-primary mt-2 submit-button"} >Account</button>
+                            <button onClick={() => flyySDK.openRedeemScreen()} className={"form-control btn-primary mt-2 submit-button"} >Account</button>
                         </div>
                     </div>
 
