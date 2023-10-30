@@ -10,6 +10,8 @@ function App() {
 
     const flyySDK = new FlyySDK();
 
+    flyySDK.startReferralTracking();
+
     var data = {
         package_name: "theflyy.com.flyysdk",
         partner_id: "89a3e8bed066cc07268e",
