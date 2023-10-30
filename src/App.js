@@ -19,6 +19,7 @@ function App() {
         attachMode: 'popup',
         //attachMode: 'drawer',
         environment: "STAGING",
+        device_id: "flyy-demo-app"
     };
     
 
@@ -59,6 +60,7 @@ function App() {
         }).then(res => res.json()).then((res) => {
             console.log(res);
             data.ext_user_token = res.token;
+            data.device_id = res.device_id;
             flyySDK.setActionButtonPosition('left');
             flyySDK.setActionButtonColor('#faa232');
             flyySDK.setActionButtonText('Reward Points');
