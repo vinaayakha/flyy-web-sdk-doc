@@ -10,13 +10,20 @@ function App() {
 
     const flyySDK = new FlyySDK();
 
+    flyySDK.startReferralTracking();
+    flyySDK.setActionButtonPosition('right');
+    flyySDK.setActionButtonColor('#faa232');
+    flyySDK.setActionButtonText('Reward Points');
+    flyySDK.setActionButtonWidth("130");
+
     var data = {
-        package_name: "theflyy.com.flyysdk",
-        partner_id: "89a3e8bed066cc07268e",
-        ext_user_token: "nAlyijFANB",
-        attachMode: 'popup',
+        package_name: "com.theflyy.prod.nurture",
+        partner_id: "7195cd9614c37dd6042d",
+        // ext_user_token: "yG7mlM0rlU",
+        attachMode: 'embed',
         //attachMode: 'drawer',
         environment: "STAGING",
+        device_id: Math.random().toString(36).substr(2, 33)
     };
     
 
@@ -45,26 +52,44 @@ function App() {
 
     const language = "js";
 
-    const [userName, setUserName] = useState("");
+    const [userName, setUserName] = useState("2222");
+    const getReferrer = (user_id) => {
+        const myHeaders = new Headers();
+        myHeaders.append("PARTNER-KEY", "iMmw4dYwIUXbgy16UBRPhc3PizsNydNdXfSjGrg7");
+
+        const requestOptions = {
+        method: "GET",
+        headers: myHeaders,
+        };
+
+    }
     const startFlyy = () => {
-        fetch(`https://stage-partner-api.theflyy.com/v1/89a3e8bed066cc07268e/user/${userName}/user_token`, {
+        flyySDK.init(JSON.stringify(data));
+        flyySDK.setUserName("user name set by method")
+        
+        fetch(`https://stage-partner-api.theflyy.com/v1/7195cd9614c37dd6042d/user/${userName}/user_token`, {
             method : "POST",
             headers : {
-                "partner-key" : "LZDHf0Fm055M3tOIxDfCKGS5LRdExE9H5eQNYf0c",
+                "partner-key" : "CjB83CozKIn9LRFy3DNmshy9a1PJbRAYEMZG8YBf",
                 "content-type": "application/json"
             },
             body : JSON.stringify({is_new: "false", username: userName})
         }).then(res => res.json()).then((res) => {
             console.log(res);
             data.ext_user_token = res.token;
-            flyySDK.setActionButtonPosition('left');
-            flyySDK.setActionButtonColor('#faa232');
-            flyySDK.setActionButtonText('Reward Points');
+            data.device_id = res.device_id;
+            data["ext_uid"] = userName;
             flyySDK.init(JSON.stringify(data));
             flyySDK.setUserName("user name set by method");
-            flyySDK.setUserBankCredntials({acc_type: "upi", upi_id: "vinuyer@ybl"})
+            if (data.attachMode == 'embed') {
+                flyySDK.clickToOpenSDK(data);
+            }
         })
     }
+    
+    // flyySDK.setUserBankCredntials({acc_type: "upi", upi_id: "vinuyer@ybl"})
+
+        // "flyy-web-sdk": "file:../flyy-sdk-package",
 
     return (
         <div className="parent-container">
@@ -79,6 +104,7 @@ function App() {
                 <div className={"mt-2"}>
                 <h4>Install the Package using npm</h4>
                 </div>
+
                 
                 <CodeBlock text={"npm i fly-web-sdk"}/>
 
@@ -91,6 +117,7 @@ function App() {
                         theme={dracula} />
                 </div>
 
+                <div id="embed-flyy-sdk"></div>
                 <div style={{textAlign: 'center'}}>
                     <h4>Enter user id to generate token in Flyy and Initilize Flyy</h4>
                     <div  style={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
