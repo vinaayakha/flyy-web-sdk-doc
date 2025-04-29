@@ -7,18 +7,25 @@ import { CodeBlock, dracula } from "react-code-blocks";
 
 
 function App() {
+    const [partnerId, setPartnerId] = useState("");
+    const [packageName, setPackageName] = useState("");
+    const [environment, setEnvironment] = useState("STAGING");
+    const [partnerKey, setPartnerKey] = useState("");
+    const [userName, setUserName] = useState("");
+    const [token, setToken] = useState("");
+    const [deviceId, setDeviceId] = useState("");
 
     const flyySDK = new FlyySDK();
 
     flyySDK.startReferralTracking();
 
     var data = {
-        package_name: "theflyy.com.flyysdk",
-        partner_id: "89a3e8bed066cc07268e",
+        package_name: packageName,
+        partner_id: partnerId,
         ext_user_token: "nAlyijFANB",
         attachMode: 'popup',
         //attachMode: 'drawer',
-        environment: "STAGING",
+        environment: environment,
         device_id: "flyy-demo-app"
     };
     
@@ -48,26 +55,51 @@ function App() {
 
     const language = "js";
 
-    const [userName, setUserName] = useState("");
-    const startFlyy = () => {
-        fetch(`https://stage-partner-api.theflyy.com/v1/89a3e8bed066cc07268e/user/${userName}/user_token`, {
-            method : "POST",
-            headers : {
-                "partner-key" : "LZDHf0Fm055M3tOIxDfCKGS5LRdExE9H5eQNYf0c",
-                "content-type": "application/json"
-            },
-            body : JSON.stringify({is_new: "false", username: userName})
-        }).then(res => res.json()).then((res) => {
-            console.log(res);
-            data.ext_user_token = res.token;
-            data.device_id = res.device_id;
+    const startFlyy = async () => {
+        if (!partnerId) {
+            alert("Please enter Partner ID");
+            return;
+        }
+        if (environment === "STAGING" && !partnerKey) {
+            alert("Please enter Partner Key");
+            return;
+        }
+        if (environment === "PRODUCTION" && (!token || !deviceId)) {
+            alert("Please enter Token and Device ID for PRODUCTION environment");
+            return;
+        }
+
+        try {
+            if (environment === "PRODUCTION") {
+                data.ext_user_token = token;
+                data.device_id = deviceId;
+            } else {
+                const baseUrl = "https://stage-partner-api.theflyy.com/v1";
+                const response = await fetch(`${baseUrl}/${partnerId}/user/${userName}/user_token`, {
+                    method: "POST",
+                    headers: {
+                        "partner-key": partnerKey,
+                        "content-type": "application/json"
+                    },
+                    body: JSON.stringify({is_new: "false", username: userName})
+                });
+                
+                const res = await response.json();
+                console.log(res);
+                data.ext_user_token = res.token;
+                data.device_id = res.device_id;
+            }
+
             flyySDK.setActionButtonPosition('left');
             flyySDK.setActionButtonColor('#faa232');
             flyySDK.setActionButtonText('Reward Points');
             flyySDK.init(JSON.stringify(data));
-            flyySDK.setUserName("user name set by method");
-            flyySDK.setUserBankCredntials({acc_type: "upi", upi_id: "vinuyer@ybl"})
-        })
+            flyySDK.setUserName(userName);
+            flyySDK.setUserBankCredntials({acc_type: "upi", upi_id: "vinuyer@ybl"});
+        } catch (error) {
+            console.error("Error initializing Flyy:", error);
+            alert("Failed to initialize Flyy. Please check your configuration and try again.");
+        }
     }
 
     return (
@@ -96,6 +128,67 @@ function App() {
                 </div>
 
                 <div style={{textAlign: 'center'}}>
+                    <h4>Enter configuration details</h4>
+                    <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px', marginBottom: '20px'}}>
+                        <div style={{display: 'flex', alignItems: 'center', gap: '10px'}}>
+                            <label>Partner ID:</label>
+                            <input 
+                                value={partnerId} 
+                                onChange={(e) => setPartnerId(e.target.value)} 
+                                style={{margin: '5px'}}
+                            />
+                        </div>
+                        <div style={{display: 'flex', alignItems: 'center', gap: '10px'}}>
+                            <label>Package Name:</label>
+                            <input 
+                                value={packageName} 
+                                onChange={(e) => setPackageName(e.target.value)} 
+                                style={{margin: '5px'}}
+                            />
+                        </div>
+                        <div style={{display: 'flex', alignItems: 'center', gap: '10px'}}>
+                            <label>Environment:</label>
+                            <select 
+                                value={environment} 
+                                onChange={(e) => setEnvironment(e.target.value)}
+                                style={{margin: '5px'}}
+                            >
+                                <option value="STAGING">STAGING</option>
+                                <option value="PRODUCTION">PRODUCTION</option>
+                            </select>
+                        </div>
+                        {environment === "STAGING" && (
+                            <div style={{display: 'flex', alignItems: 'center', gap: '10px'}}>
+                                <label>Partner Key:</label>
+                                <input 
+                                    value={partnerKey} 
+                                    onChange={(e) => setPartnerKey(e.target.value)} 
+                                    style={{margin: '5px'}}
+                                />
+                            </div>
+                        )}
+                        {environment === "PRODUCTION" && (
+                            <>
+                                <div style={{display: 'flex', alignItems: 'center', gap: '10px'}}>
+                                    <label>Token:</label>
+                                    <input 
+                                        value={token} 
+                                        onChange={(e) => setToken(e.target.value)} 
+                                        style={{margin: '5px'}}
+                                    />
+                                </div>
+                                <div style={{display: 'flex', alignItems: 'center', gap: '10px'}}>
+                                    <label>Device ID:</label>
+                                    <input 
+                                        value={deviceId} 
+                                        onChange={(e) => setDeviceId(e.target.value)} 
+                                        style={{margin: '5px'}}
+                                    />
+                                </div>
+                            </>
+                        )}
+                    </div>
+
                     <h4>Enter user id to generate token in Flyy and Initilize Flyy</h4>
                     <div  style={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
                     <input value={userName} onChange={(e) => {setUserName(e.target.value)}} style={{margin: '5px'}}/>
